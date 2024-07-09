@@ -1,3 +1,18 @@
+/*
+ * ======================================================================================
+ *                               AudioManager Script
+ * ======================================================================================
+ * This script manages the audio settings and background music for different scenes in Unity.
+ * It implements a singleton pattern to ensure only one instance of the AudioManager exists.
+ * It handles setting and saving volume settings for master, music, and SFX channels.
+ *
+ * Key Features:
+ * - Manages volume settings and saves them using PlayerPrefs.
+ * - Plays background music based on the current scene.
+ * - Ensures a single instance of AudioManager across scenes.
+ * ======================================================================================
+ */
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +30,7 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
+        // * Ensure only one instance of the AudioManager exists
         if (instance == null)
         {
             instance = this;
@@ -26,8 +42,10 @@ public class AudioManager : MonoBehaviour
         }
         bgmPlayer = GetComponent<AudioSource>();
     }
+
     private void Start()
     {
+        // * Load volume settings from PlayerPrefs
         if (PlayerPrefs.HasKey("volumeMasterPref"))
             SetVolumeMaster(PlayerPrefs.GetFloat("volumeMasterPref"));
         if (PlayerPrefs.HasKey("volumeMusicPref"))
@@ -38,19 +56,25 @@ public class AudioManager : MonoBehaviour
 
     public void SetVolumeMaster(float volumeMaster)
     {
+        // * Set the master volume
         mixer.SetFloat("VolumeMaster", Mathf.Log10(volumeMaster) * 20);
     }
 
     public void SetVolumeMusic(float volumeMusic)
     {
+        // * Set the music volume
         mixer.SetFloat("VolumeMusic", Mathf.Log10(volumeMusic) * 20);
     }
+
     public void SetVolumeSFX(float volumeSFX)
     {
+        // * Set the SFX volume
         mixer.SetFloat("VolumeSFX", Mathf.Log10(volumeSFX) * 20);
     }
+
     public void SaveVolumeSettings()
     {
+        // * Save the current volume settings to PlayerPrefs
         float volumeMaster;
         if (mixer.GetFloat("VolumeMaster", out volumeMaster))
         {
@@ -71,18 +95,22 @@ public class AudioManager : MonoBehaviour
 
         PlayerPrefs.Save();
     }
+
     private void OnEnable()
     {
+        // * Subscribe to the sceneLoaded event
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
     {
+        // * Unsubscribe from the sceneLoaded event
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        // * Play background music based on the current scene
         int sceneIndex = scene.buildIndex;
 
         if (sceneIndex < bmgTracks.Count && bmgTracks[sceneIndex] != null)
@@ -91,7 +119,4 @@ public class AudioManager : MonoBehaviour
             bgmPlayer.Play();
         }
     }
-
-
-
 }

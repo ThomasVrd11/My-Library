@@ -1,10 +1,26 @@
+/*
+ * ======================================================================================
+ *                               Spawner Script
+ * ======================================================================================
+ * This script manages the spawning of enemies in the game. It utilizes object pooling
+ * to efficiently manage enemy instances, reducing overhead and improving performance.
+ * It controls the spawn timing, spawn points, and maximum active enemies at any given time.
+ *
+ * Key Features:
+ * - Manages enemy spawning using object pooling.
+ * - Controls spawn timing and ensures maximum active enemies.
+ * - Handles enemy activation and deactivation.
+ * - Provides debug information for monitoring spawning activities.
+ * ======================================================================================
+ */
+
+// * hello nicolas
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Pool;
-
-// * hello nicolas
 
 public class Spawner : MonoBehaviour
 {
@@ -34,7 +50,7 @@ public class Spawner : MonoBehaviour
 		isSpawningActive = false;
 	}
 
-	// * using the ObjectPool to create a new enemy
+	// * Using the ObjectPool to create a new enemy
 	// * and set the pool to the enemy
 	private Enemy CreateEnemy()
 	{
@@ -43,7 +59,8 @@ public class Spawner : MonoBehaviour
 		enemy.gameObject.SetActive(false);
 		return enemy;
 	}
-	// * using the ObjectPool to get an enemy
+
+	// * Using the ObjectPool to get an enemy
 	// * and set the position of the enemy
 	private void PreSpawnEnemies()
 	{
@@ -53,11 +70,11 @@ public class Spawner : MonoBehaviour
 			enemyPool.Release(enemy);
 		}
 	}
+
 	private void OnGetEnemy(Enemy enemy)
 	{
 		if (currentActiveEnemies >= maxActiveEnemies) return;
 		enemy.currentHealth = enemy.startingHealth;
-
 	}
 
 	private void OnReleaseEnemy(Enemy enemy)
@@ -71,6 +88,7 @@ public class Spawner : MonoBehaviour
 			if (debugMode) Debug.Log(numberOfKilledEnnemies);
 		}
 	}
+
 	void Update()
 	{
 		if (isSpawningActive && Time.time > timeSinceLastSpawn && currentActiveEnemies < maxActiveEnemies && totalSpawnedEnemies < numberOfEnnemiesNeeded)
@@ -78,11 +96,13 @@ public class Spawner : MonoBehaviour
 			SpawnEnemyAtPoint();
 			timeSinceLastSpawn = Time.time + timeBetweenSpawns;
 			if (debugMode) Debug.Log("current active " + currentActiveEnemies);
-		} else if ( totalSpawnedEnemies >= numberOfEnnemiesNeeded) StopSpawning();
+		}
+		else if (totalSpawnedEnemies >= numberOfEnnemiesNeeded) StopSpawning();
 	}
+
 	public void SpawnEnemyAtPoint()
 	{
-		int spawnIndex = Random.Range(0, spawnPoints.Length);
+		int spawnIndex = Random.Range(0, spawnPoints.length);
 		if (spawnIndex < 0 || spawnIndex >= spawnPoints.Length)
 		{
 			Debug.LogError("Invalid spawn point spawnIndex");
@@ -111,6 +131,7 @@ public class Spawner : MonoBehaviour
 			}
 		}
 	}
+
 	private Vector3 GetValidNavMeshPosition(Vector3 position)
 	{
 		NavMeshHit hit;
@@ -128,9 +149,11 @@ public class Spawner : MonoBehaviour
 		totalSpawnedEnemies = 0;
 		numberOfKilledEnnemies = 0;
 	}
+
 	public void StopSpawning()
 	{
 		isSpawningActive = false;
 	}
 }
+
 // * In EnemyAIMelee.cs, the enemy is Released after getting killed
