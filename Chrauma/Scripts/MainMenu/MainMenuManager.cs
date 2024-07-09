@@ -1,3 +1,19 @@
+/*
+ * ======================================================================================
+ *                             MainMenuManager Script
+ * ======================================================================================
+ * This script manages the main menu interactions and visual effects, such as rotating
+ * the player character plate, changing saturation, and handling game start events.
+ *
+ * Key Features:
+ * - Changes saturation over time using post-processing effects.
+ * - Rotates the player character plate until a new game is started.
+ * - Manages the transition from the main menu to the game scene.
+ * - Checks for saved game data and enables the continue button if available.
+ * - Prompts the player if they want to override an existing save when starting a new game.
+ * ======================================================================================
+ */
+
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -6,36 +22,36 @@ using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour
 {
-    /* Post processing volume */
+    // * Post processing volume
     [SerializeField] Volume volume;
-    /* Duration for saturation change */
+    // * Duration for saturation change
     [SerializeField] float duration = 5.0f;
-    /* Animator for the player character*/
+    // * Animator for the player character
     [SerializeField] Animator playerAnimator;
-    /* Object containing the player*/
+    // * Object containing the player
     [SerializeField] GameObject playerPlate;
-    /* Main Camera */
+    // * Main Camera
     [SerializeField] GameObject mainCamera;
-    /* Cinematic camera */
+    // * Cinematic camera
     [SerializeField] GameObject cinematicCamera;
-    /* Canvas group for fading UI */
+    // * Canvas group for fading UI
     [SerializeField] CanvasGroup canvasGroup;
-    /* Continue button */
+    // * Continue button
     [SerializeField] Button continueButton;
-    /* Override save prompt*/
+    // * Override save prompt
     [SerializeField] GameObject overrideSave;
 
-    /* Color adjustement for post-process */
+    // * Color adjustments for post-process
     private ColorAdjustments colorAdjustments;
-    /* Flag to check if new game is started*/
+    // * Flag to check if new game is started
     private bool selectedStart = false;
 
     private void Start()
     {
-        /*
-        Try to get the colorAdjustments component from volume profile
-        check if save game exist,to enable continue button
-        */
+        // *
+        // * Try to get the colorAdjustments component from volume profile
+        // * Check if save game exists to enable continue button
+        // *
         if (volume.profile.TryGet(out colorAdjustments))
         {
             StartCoroutine(ChangeSaturation());
@@ -48,7 +64,7 @@ public class MainMenuManager : MonoBehaviour
 
     void Update()
     {
-        /* Make the player plate rotate until a new game is started */
+        // * Make the player plate rotate until a new game is started
         if (!selectedStart)
         {
             Vector3 currentRotation = mainCamera.transform.eulerAngles;
@@ -60,7 +76,7 @@ public class MainMenuManager : MonoBehaviour
 
     IEnumerator ChangeSaturation()
     {
-        /* Coroutine to change the saturation over time */
+        // * Coroutine to change the saturation over time
         while (true)
         {
             yield return new WaitForSeconds(15);
@@ -82,7 +98,7 @@ public class MainMenuManager : MonoBehaviour
 
     public void startTheGame()
     {
-        /* Start the animation and scene switch when starting a new game */
+        // * Start the animation and scene switch when starting a new game
         int isDed = Animator.StringToHash("isDed");
         playerAnimator.SetBool(isDed, true);
         mainCamera.SetActive(false);
@@ -91,9 +107,10 @@ public class MainMenuManager : MonoBehaviour
         StartCoroutine(FadeCanvasGroup());
         StartCoroutine(launchGame());
     }
+
     private IEnumerator FadeCanvasGroup()
     {
-        /* Fade the canvas alpha to 0 over time */
+        // * Fade the canvas alpha to 0 over time
         float timeStartedLerping = Time.time;
         float timeSinceStarted = 0f;
         float percentageComplete = 0f;
@@ -112,13 +129,14 @@ public class MainMenuManager : MonoBehaviour
 
     IEnumerator launchGame()
     {
-        /* start the game after a delay */
+        // * Start the game after a delay
         yield return new WaitForSeconds(5);
         GameManager.instance.SwitchScene(1);
     }
+
     public void CheckOverride()
     {
-        /* Checks if there is a save file,and prompt the override warning if it exists */
+        // * Checks if there is a save file, and prompt the override warning if it exists
         if (!DataPersistenceManager.instance.CheckIfSave())
         {
             DataPersistenceManager.instance.NewGame();

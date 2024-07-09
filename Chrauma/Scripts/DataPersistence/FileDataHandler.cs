@@ -1,14 +1,27 @@
+/*
+ * ======================================================================================
+ *                                 FileDataHandler Script
+ * ======================================================================================
+ * This script handles the saving and loading of game data to and from a JSON file.
+ * It uses Unity's JsonUtility for serialization and deserialization of game data.
+ *
+ * Key Features:
+ * - Loads game data from a JSON file.
+ * - Saves game data to a JSON file.
+ * - Manages file paths and ensures directories exist for saving.
+ * ======================================================================================
+ */
+
 using UnityEngine;
 using System;
 using System.IO;
 
 public class FileDataHandler
 {
-    /* Directory path where the data file is stored*/
+    // * Directory path where the data file is stored
     private string dataDirPath = "";
-    /* Name of the data file */
+    // * Name of the data file
     private string dataFileName = "";
-
 
     public FileDataHandler(string dataDirPath, string dataFileName)
     {
@@ -20,6 +33,7 @@ public class FileDataHandler
         this.dataDirPath = dataDirPath;
         this.dataFileName = dataFileName;
     }
+
     public GameData Load()
     {
         /*
@@ -47,11 +61,12 @@ public class FileDataHandler
             }
             catch (Exception ex)
             {
-                Debug.LogError("Error occured when trying to load data from file:" + fullPath + "\n" + ex);
+                Debug.LogError("Error occurred when trying to load data from file: " + fullPath + "\n" + ex);
             }
         }
         return loadedData;
     }
+
     public void Save(GameData data)
     {
         /*
@@ -77,7 +92,7 @@ public class FileDataHandler
         }
         catch (Exception ex)
         {
-            Debug.LogError("Error occured when trying to save data to file:" + fullPath + "\n" + ex);
+            Debug.LogError("Error occurred when trying to save data to file: " + fullPath + "\n" + ex);
         }
     }
 }
